@@ -78,9 +78,12 @@ void client::handleMessage(cMessage *msg)
     }
     else
     {
-        EV << "Message arrived, starting to wait 1 sec...\n";
+
+        simtime_t delay = par("delayTime");
+        EV << "Message arrived, starting to wait" << delay << "...\n";
+
         clientMsg = msg;
-        scheduleAt(simTime()+1.0, event);
+        scheduleAt(simTime() + delay, event);
     }
 }
 

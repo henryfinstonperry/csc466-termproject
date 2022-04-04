@@ -3,6 +3,7 @@ simple client
     parameters:
         bool sendMsgOnInit = default(false);
         int limit = default(2);
+        volatile double delayTime @unit(s);
     gates:
         input in;
         output out;
