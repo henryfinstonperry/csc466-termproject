@@ -1,4 +1,4 @@
-<iframe src="https://drive.google.com/file/d/1-BBLOwNFsy9dA8b1OBAFWWLb8Ejt3hpl/preview" width="640" height="480" allow="autoplay"></iframe>
+<iframe src="https://drive.google.com/file/d/1-BBLOwNFsy9dA8b1OBAFWWLb8Ejt3hpl/view?usp=sharing" width="640" height="480" allow="autoplay"></iframe>
 
 ## Welcome to GitHub Pages
 
