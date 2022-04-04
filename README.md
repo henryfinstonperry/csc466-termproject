@@ -10,6 +10,10 @@
 
 # Publications
 
-[Project Proposal](https://docs.google.com/document/d/1vnjrAysrQ8N0YV7PXzzVy-eGMYY4nujcFOPSVO40po4/edit?usp=sharing)
+## Project proposal
 
-[Project Update](https://docs.google.com/document/d/1miPaOtm_mzaojTP24g3KDIg7Ul07lUHkZfP2XTGLQE4/edit?usp=sharing)
+[Download PP](https://docs.google.com/document/d/1vnjrAysrQ8N0YV7PXzzVy-eGMYY4nujcFOPSVO40po4/edit?usp=sharing)
+
+## Project update
+
+[Download PU](https://docs.google.com/document/d/1miPaOtm_mzaojTP24g3KDIg7Ul07lUHkZfP2XTGLQE4/edit?usp=sharing)
