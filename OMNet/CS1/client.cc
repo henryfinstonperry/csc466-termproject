@@ -4,21 +4,15 @@
 
 using namespace omnetpp;
 
-/**
- * Derive the client class from cSimpleModule. In the client1 network,
- * both the `tic' and `toc' modules are client objects, created by OMNeT++
- * at the beginning of the simulation.
- */
-class client : public cSimpleModule
+class client1 : public cSimpleModule
 {
 private:
-    int counter;
-    cMessage *event;  // pointer to the event object which we'll use for timing
-    cMessage *clientMsg;  // variable to remember the message until we send it back
+    simtime_t timeout;
+    cMessage *timeoutEvent;
 
 public:
-    client();
-    virtual ~client();
+    client1();
+    virtual ~client1();
 protected:
     // The following redefined virtual function holds the algorithm.
     virtual void initialize() override;
@@ -26,64 +20,79 @@ protected:
 };
 
 // The module class needs to be registered with OMNeT++
-Define_Module(client);
 
-client::client()
+Define_Module(client1);
+
+client1::client1()
 {
-    // Set the pointer to nullptr, so that the destructor won't crash
-    // even if initialize() doesn't get called because of a runtime
-    // error or user cancellation during the startup process.
-    event = clientMsg = nullptr;
+    timeoutEvent = nullptr;
 }
 
-client::~client()
+client1::~client1()
 {
-    // Dispose of dynamically allocated the objects
-    cancelAndDelete(event);
-    delete clientMsg;
+    cancelAndDelete(timeoutEvent);
 }
 
-void client::initialize()
+void client1::initialize()
 {
-    event = new cMessage("event");
+    timeout = 1.0;
+    timeoutEvent = new cMessage("timeoutEvent");
 
-    // No client message yet.
-    clientMsg = nullptr;
-
-    counter = par("limit");
 
     if(par("sendMsgOnInit").boolValue() == true) {
         cMessage *msg = new cMessage("clientMsg");
         send(msg, "out");
+        scheduleAt(simTime()+timeout, timeoutEvent);
     }
 }
 
 
-void client::handleMessage(cMessage *msg)
+void client1::handleMessage(cMessage *msg)
 {
-    if (counter == 0)
-    {
-        delete msg;
-    }
-    else if (msg == event)
-    {
-        EV << "Wait period is over, sending back message\n";
-        counter--;
-        EV <<"Counter = " << counter << "\n";
 
-        msg = clientMsg;
-        send(msg, "out");
-
-        clientMsg = nullptr;
+    if (msg == timeoutEvent)
+    {
+        EV << "Timeout expired, resending message and restarting timer\n";
+        cMessage *newMsg = new cMessage("clientMsg");
+        send(newMsg, "out");
+        scheduleAt(simTime()+timeout, timeoutEvent);
     }
+    // message arrived
+    // Acknowledgement received -- delete the received message and cancel
+    // the timeout event.
     else
     {
+        EV << "Timer cancelled.\n";
+        cancelEvent(timeoutEvent);
+        delete msg;
 
-        simtime_t delay = par("delayTime");
-        EV << "Message arrived, starting to wait" << delay << "...\n";
+        cMessage *newMsg = new cMessage("clientMsg");
+        send(newMsg, "out");
+        scheduleAt(simTime()+timeout, timeoutEvent);
+    }
+}
 
-        clientMsg = msg;
-        scheduleAt(simTime() + delay, event);
+/**
+ * Sends back an acknowledgement -- or not.
+ */
+class client2 : public cSimpleModule
+{
+  protected:
+    virtual void handleMessage(cMessage *msg) override;
+};
+
+Define_Module(client2);
+
+void client2::handleMessage(cMessage *msg)
+{
+    if (uniform(0, 1) < 0.3) {
+        EV << "\"Losing\" message.\n";
+        bubble("message lost");  // making animation more informative...
+        delete msg;
+    }
+    else {
+        EV << "Sending back same message as acknowledgement.\n";
+        send(msg, "out");
     }
 }
 
