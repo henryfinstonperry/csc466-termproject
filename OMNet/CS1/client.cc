@@ -21,7 +21,7 @@ protected:
     // The following redefined virtual function holds the algorithm.
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void sendMessage(MyPacket *msg);
+    virtual void sendMessageToAll(MyPacket *msg);
     virtual void sendWorldUpdates(MyPacket *msg);
     virtual void updateClientList(const char *client_name);
 
@@ -50,12 +50,12 @@ void d_serv::initialize()
 
     if(par("sendMsgOnInit").boolValue() == true) {
         MyPacket *msg = new MyPacket("initial world snapshot");
-        sendMessage(msg);
+        sendMessageToAll(msg);
         scheduleAt(simTime()+tick_rate, tick);
     }
 }
 
-void d_serv::sendMessage(MyPacket *msg)
+void d_serv::sendMessageToAll(MyPacket *msg)
 {
     for (int i=0; i< gateSize("out"); i++)
     {
@@ -103,20 +103,23 @@ void d_serv::updateClientList(const char *client_name)
 
 void d_serv::handleMessage(cMessage *msg)
 {
-
     MyPacket *packet_holder;
     packet_holder = new MyPacket("empty");
-
     packet_holder = (MyPacket *)msg;
 
     if (msg == tick)
     {
         counter++;
-        EV << "tick " << counter << ", update object states and check if clients need an updated snapshot\n";
+
         std::string temp = "world snapshot @ tick" + std::to_string(counter);
         const char *str = temp.c_str();
         MyPacket *newMsg = new MyPacket(str);
-        sendWorldUpdates(newMsg);
+        if(counter % 5 == 0){
+            sendMessageToAll(newMsg);
+        } else {
+            sendWorldUpdates(newMsg);
+        }
+        delete newMsg;
         scheduleAt(simTime()+tick_rate, tick);
     }
     if (packet_holder->hasBitError())
@@ -128,6 +131,7 @@ void d_serv::handleMessage(cMessage *msg)
         EV << "client message received from client: " << msg->getName() << "\n";
         updateClientList(msg->getName());
     }
+
 }
 
 
@@ -139,6 +143,7 @@ class client : public cSimpleModule
 private:
     simtime_t player_input_timer;
     MyPacket *player_input;
+    double packet_drop_rate;
   protected:
     virtual void handleMessage(cMessage *msg) override;
     virtual void initialize() override;
@@ -161,6 +166,9 @@ client::~client()
 
 void client::initialize()
 {
+    if(par("packet_drop").doubleValue() == true){
+        packet_drop_rate = double(par("packet_drop"));
+    }
     player_input_timer = uniform(0,1);
     player_input = new MyPacket(getName());
     scheduleAt(simTime()+player_input_timer, player_input);
@@ -171,20 +179,107 @@ void client::handleMessage(cMessage *msg)
     MyPacket *packet_holder = (MyPacket *)msg;
     if (msg == player_input){
             MyPacket *newMsg = new MyPacket(getName());
-            if (uniform(0, 1) < 0.002) {
+            if (uniform(0, 1) < packet_drop_rate) {
                         newMsg->setBitError(true);
              }
             send(newMsg, "out");
-            player_input_timer = uniform(0,1);
+            player_input_timer = uniform(0.1,1);
             scheduleAt(simTime()+player_input_timer, player_input);
     }
     else if(packet_holder->hasBitError())
     {
-            bubble("bit Error");
+            bubble("an incoming packet was lost");
     }
-
 }
 
 
+class node : public cSimpleModule
+{
+private:
+    bool game_state;
+    simtime_t user_changed_world_timer;
+    MyPacket *user_changed_world;
+protected:
+    virtual void flip_game_state();
+    virtual void handleMessage(cMessage *msg) override;
+    virtual void initialize() override;
+    virtual void sendMessages(MyPacket *msg);
 
+public:
+    node();
+    virtual ~node();
+};
+
+Define_Module(node);
+
+node::node()
+{
+    user_changed_world = nullptr;
+}
+
+node::~node()
+{
+    cancelAndDelete(user_changed_world);
+}
+
+void node::initialize()
+{
+    user_changed_world_timer = uniform(0.1,3);
+    user_changed_world = new MyPacket("self");
+    game_state = false;
+    scheduleAt(simTime()+user_changed_world_timer, user_changed_world);
+}
+
+void node::flip_game_state()
+{
+    game_state = !game_state;
+}
+
+void node::sendMessages(MyPacket *msg)
+{
+    for (int i=0; i< gateSize("out"); i++)
+    {
+        MyPacket *copy = msg->dup();
+        send(copy, "out", i);
+    }
+}
+
+void node::handleMessage(cMessage *msg)
+{
+    MyPacket *packet_holder = (MyPacket *)msg;
+    if(msg == user_changed_world)
+    {
+        flip_game_state();
+        MyPacket *newMsg = nullptr;
+        if(game_state){
+            newMsg = new MyPacket("true");
+        }else{
+            newMsg = new MyPacket("false");
+        }
+        sendMessages(newMsg);
+        scheduleAt(simTime()+user_changed_world_timer, user_changed_world);
+    }
+    else if(packet_holder->hasBitError())
+    {
+        bubble("an incoming packet lost");
+    }
+    else
+    {
+        const char *msg_game_state = msg->getName();
+        if(msg_game_state == std::string("true"))
+        {
+            game_state = true;
+            bubble("game state: true");
+        }
+        else if (msg_game_state == std::string("false"))
+        {
+            game_state = false;
+            bubble("game state: false");
+        }
+        else
+        {
+            bubble("received packet with bad name");
+        }
+    }
+}
 
