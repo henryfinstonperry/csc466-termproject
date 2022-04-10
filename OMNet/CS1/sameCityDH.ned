@@ -12,7 +12,7 @@ simple d_serv
 channel channelC extends ned.DatarateChannel
 {
     datarate = 100Mbps;
-    delay = 100us;
+    delay = 5us;
     
 }
 
