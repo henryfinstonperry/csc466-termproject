@@ -199,6 +199,7 @@ private:
     bool game_state;
     simtime_t user_changed_world_timer;
     MyPacket *user_changed_world;
+    double packet_drop_rate;
 protected:
     virtual void flip_game_state();
     virtual void handleMessage(cMessage *msg) override;
@@ -224,6 +225,10 @@ node::~node()
 
 void node::initialize()
 {
+    if(par("packet_drop").doubleValue() == true)
+    {
+        packet_drop_rate = double(par("packet_drop"));
+    }
     user_changed_world_timer = uniform(0.1,3);
     user_changed_world = new MyPacket("self");
     game_state = false;
@@ -255,6 +260,10 @@ void node::handleMessage(cMessage *msg)
             newMsg = new MyPacket("true");
         }else{
             newMsg = new MyPacket("false");
+        }
+        if (uniform(0, 1) < packet_drop_rate)
+        {
+            newMsg->setBitError(true);
         }
         sendMessages(newMsg);
         scheduleAt(simTime()+user_changed_world_timer, user_changed_world);
