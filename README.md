@@ -1,37 +1,19 @@
-## Welcome to GitHub Pages
+# Project demo
 
-You can use the [editor on GitHub](https://github.com/henryfinstonperry/csc466-termproject/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+## Part one
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+<iframe src="https://drive.google.com/file/d/1Z9jSYLCProFktcHFu4VutYaThKKaNNzl/preview?usp=sharing" width="640" height="480" allow="autoplay"></iframe>
 
-### Markdown
+## Part two
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+<iframe src="https://drive.google.com/file/d/1-BBLOwNFsy9dA8b1OBAFWWLb8Ejt3hpl/preview?usp=sharing" width="640" height="480" allow="autoplay"></iframe>
 
-```markdown
-Syntax highlighted code block
+# Publications
 
-# Header 1
-## Header 2
-### Header 3
+## Project proposal
 
-- Bulleted
-- List
+[Download PP](https://docs.google.com/document/d/1vnjrAysrQ8N0YV7PXzzVy-eGMYY4nujcFOPSVO40po4/edit?usp=sharing)
 
-1. Numbered
-2. List
+## Project update
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/henryfinstonperry/csc466-termproject/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+[Download PU](https://docs.google.com/document/d/1miPaOtm_mzaojTP24g3KDIg7Ul07lUHkZfP2XTGLQE4/edit?usp=sharing)
