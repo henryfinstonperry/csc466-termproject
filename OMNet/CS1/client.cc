@@ -1,98 +1,99 @@
 #include <string.h>
 #include <stdio.h>
 #include <omnetpp.h>
+#include <MyPacket_m.h>
 
 
 using namespace omnetpp;
 
-class client1 : public cSimpleModule
+class d_serv : public cSimpleModule
 {
 private:
-    simtime_t timeout;
-    cPacket *timeoutEvent;
+    simtime_t tick_rate;
+    MyPacket *tick;
+    int counter;
 
 public:
-    client1();
-    virtual ~client1();
+    d_serv();
+    virtual ~d_serv();
 protected:
     // The following redefined virtual function holds the algorithm.
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void sendMessage(cMessage *msg);
+    virtual void sendMessage(MyPacket *msg);
 
 };
 
 // The module class needs to be registered with OMNeT++
 
-Define_Module(client1);
+Define_Module(d_serv);
 
-client1::client1()
+d_serv::d_serv()
 {
-    timeoutEvent = nullptr;
+    tick = nullptr;
 }
 
-client1::~client1()
+d_serv::~d_serv()
 {
-    cancelAndDelete(timeoutEvent);
+    cancelAndDelete(tick);
 }
 
-void client1::initialize()
+void d_serv::initialize()
 {
-    timeout = 1.0;
-    timeoutEvent = new cPacket("timeoutEvent");
+    counter = 0;
+    tick_rate = 0.0015;
+    tick = new MyPacket("tick");
 
 
     if(par("sendMsgOnInit").boolValue() == true) {
-        cPacket *msg = new cPacket("clientMsg");
+        MyPacket *msg = new MyPacket("initial world snapshot");
         sendMessage(msg);
-        scheduleAt(simTime()+timeout, timeoutEvent);
+        scheduleAt(simTime()+tick_rate, tick);
     }
 }
 
-void client1::sendMessage(cMessage *msg)
+void d_serv::sendMessage(MyPacket *msg)
 {
     for (int i=0; i< gateSize("out"); i++)
     {
-        cMessage *copy = msg->dup();
+        MyPacket *copy = msg->dup();
         send(copy, "out", i);
+
     }
 }
 
-void client1::handleMessage(cMessage *msg)
+void d_serv::handleMessage(cMessage *msg)
 {
-    cPacket *packet_holder;
-    packet_holder = new cPacket("empty");
-    if(msg->isPacket()){
-        packet_holder = (cPacket *)msg;
-    }
-    if (msg == timeoutEvent)
+
+    MyPacket *packet_holder;
+    packet_holder = new MyPacket("empty");
+
+    packet_holder = (MyPacket *)msg;
+
+    if (msg == tick)
     {
-        EV << "Timeout expired, resending message and restarting timer\n";
-        cPacket *newMsg = new cPacket("clientMsg");
+        counter++;
+        EV << "tick " << counter << ", update object states and check if clients need an updated snapshot\n";
+        std::string temp = "world snapshot @ tick" + std::to_string(counter);
+        const char *str = temp.c_str();
+        MyPacket *newMsg = new MyPacket(str);
         sendMessage(newMsg);
-        scheduleAt(simTime()+timeout, timeoutEvent);
+        scheduleAt(simTime()+tick_rate, tick);
     }
-    else if (packet_holder->hasBitError())
+
+    if (packet_holder->hasBitError())
     {
-        EV << "Ack has bit error, resending message\n";
-        cPacket *newMsg = new cPacket("clientMsg");
+        bubble("client message has bit error");
+        MyPacket *newMsg = new MyPacket("clientMsg");
         sendMessage(newMsg);
-        scheduleAt(simTime()+timeout, timeoutEvent);
+        //scheduleAt(simTime()+tick_rate, tick);
     }
-    // message arrived
-    // Acknowledgement received -- delete the received message and cancel
-    // the timeout event.
     else
     {
-        EV << "Timer cancelled.\n";
-        cancelEvent(timeoutEvent);
-        delete msg;
-
-        cPacket *newMsg = new cPacket("clientMsg");
-        sendMessage(msg);
-        scheduleAt(simTime()+timeout, timeoutEvent);
+        EV << "client message received.\n";
     }
 }
+
 
 
 
@@ -100,17 +101,17 @@ void client1::handleMessage(cMessage *msg)
 /**
  * Sends back an acknowledgement -- or not.
  */
-class client2 : public cSimpleModule
+class client : public cSimpleModule
 {
   protected:
     virtual void handleMessage(cMessage *msg) override;
 };
 
-Define_Module(client2);
+Define_Module(client);
 
-void client2::handleMessage(cMessage *msg)
+void client::handleMessage(cMessage *msg)
 {
-    cPacket *packet_holder = (cPacket *)msg;
+    MyPacket *packet_holder = (MyPacket *)msg;
     if(packet_holder->hasBitError())
     {
             EV <<"bit Error\n";
@@ -122,7 +123,6 @@ void client2::handleMessage(cMessage *msg)
     }
     else if (uniform(0, 1) > 0.6) {
             EV << "\"Bit Error\"\n";
-            bubble("Bit error");  // making animation more informative...
             packet_holder->setBitError(true);
         }
     else {

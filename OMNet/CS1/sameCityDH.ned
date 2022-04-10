@@ -1,6 +1,6 @@
 
 
-simple client1
+simple d_serv
 {
     parameters:
         bool sendMsgOnInit = default(false);
@@ -13,9 +13,10 @@ channel channelC extends ned.DatarateChannel
 {
     datarate = 100Mbps;
     delay = 100us;
+    
 }
 
-simple client2
+simple client
 {
     parameters:
         bool sendMsgOnInit = default(false);
@@ -31,22 +32,22 @@ network CS1DH
 {
     @display("bgb=781,558");
     submodules:
-        node0: client1 {
+        node0: d_serv {
             parameters:
                 sendMsgOnInit = true;
                 @display("p=701.376,461.964");
         }
-        node1: client2 {
-            @display("p=446.228,478.824");
+        node1: client {
+            @display("p=249.528,461.964");
         }
-        node2: client2 {
-            @display("p=481.072,338.324");
+        node2: client {
+            @display("p=320.34,236.04");
         }
-        node3: client2 {
-            @display("p=701.376,249.528");
+        node3: client {
+            @display("p=701.376,75.308");
         }
-        node4: client2 {
-            @display("p=555.256,219.18");
+        node4: client {
+            @display("p=483.31998,75.308");
         }
     connections:
         node0.out++ --> channelC --> node1.in;
