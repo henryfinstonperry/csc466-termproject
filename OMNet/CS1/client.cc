@@ -6,13 +6,14 @@
 
 using namespace omnetpp;
 
+
 class d_serv : public cSimpleModule
 {
 private:
     simtime_t tick_rate;
     MyPacket *tick;
     int counter;
-
+    bool clients[4];
 public:
     d_serv();
     virtual ~d_serv();
@@ -21,6 +22,8 @@ protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void sendMessage(MyPacket *msg);
+    virtual void sendWorldUpdates(MyPacket *msg);
+    virtual void updateClientList(const char *client_name);
 
 };
 
@@ -62,6 +65,42 @@ void d_serv::sendMessage(MyPacket *msg)
     }
 }
 
+void d_serv::sendWorldUpdates(MyPacket *msg)
+{
+    for (int i=0; i< gateSize("out"); i++)
+    {
+        if(clients[i]){
+            MyPacket *copy = msg->dup();
+            send(copy, "out", i);
+        }
+    }
+    for (int i = 0; i < sizeof(clients); i++)
+    {
+        clients[i] = false;
+    }
+}
+
+void d_serv::updateClientList(const char *client_name)
+{
+    bubble(client_name);
+    if(client_name == std::string("client1"))
+    {
+        clients[0] = true;
+    }
+    else if (client_name == std::string("client2"))
+    {
+        clients[1] = true;
+    }
+    else if (client_name == std::string("client3"))
+    {
+        clients[2] = true;
+    }
+    else if (client_name == std::string("client4"))
+    {
+        clients[3] = true;
+    }
+}
+
 void d_serv::handleMessage(cMessage *msg)
 {
 
@@ -77,22 +116,19 @@ void d_serv::handleMessage(cMessage *msg)
         std::string temp = "world snapshot @ tick" + std::to_string(counter);
         const char *str = temp.c_str();
         MyPacket *newMsg = new MyPacket(str);
-        sendMessage(newMsg);
+        sendWorldUpdates(newMsg);
         scheduleAt(simTime()+tick_rate, tick);
     }
-
     if (packet_holder->hasBitError())
     {
         EV << "client message has bit error\n";
     }
     else
     {
-        EV << "client message received.\n";
+        EV << "client message received from client: " << msg->getName() << "\n";
+        updateClientList(msg->getName());
     }
 }
-
-
-
 
 
 /**
