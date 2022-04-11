@@ -181,23 +181,20 @@ Register_Class(MyPacket)
 
 MyPacket::MyPacket(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
 {
-    this->someField = 0;
-    arrayField1_arraysize = 0;
-    this->arrayField1 = 0;
-    for (unsigned int i=0; i<10; i++)
-        this->arrayField2[i] = 0;
+    this->game_state = 0;
+    this->srcAddr = -1;
+    this->hopcount = 0;
+    this->startTime = 0;
+    this->lastHopAddr = -1;
 }
 
 MyPacket::MyPacket(const MyPacket& other) : ::omnetpp::cPacket(other)
 {
-    arrayField1_arraysize = 0;
-    this->arrayField1 = 0;
     copy(other);
 }
 
 MyPacket::~MyPacket()
 {
-    delete [] this->arrayField1;
 }
 
 MyPacket& MyPacket::operator=(const MyPacket& other)
@@ -210,108 +207,81 @@ MyPacket& MyPacket::operator=(const MyPacket& other)
 
 void MyPacket::copy(const MyPacket& other)
 {
-    this->someField = other.someField;
-    this->anotherField = other.anotherField;
-    delete [] this->arrayField1;
-    this->arrayField1 = (other.arrayField1_arraysize==0) ? nullptr : new double[other.arrayField1_arraysize];
-    arrayField1_arraysize = other.arrayField1_arraysize;
-    for (unsigned int i=0; i<arrayField1_arraysize; i++)
-        this->arrayField1[i] = other.arrayField1[i];
-    for (unsigned int i=0; i<10; i++)
-        this->arrayField2[i] = other.arrayField2[i];
+    this->game_state = other.game_state;
+    this->srcAddr = other.srcAddr;
+    this->hopcount = other.hopcount;
+    this->startTime = other.startTime;
+    this->lastHopAddr = other.lastHopAddr;
 }
 
 void MyPacket::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cPacket::parsimPack(b);
-    doParsimPacking(b,this->someField);
-    doParsimPacking(b,this->anotherField);
-    b->pack(arrayField1_arraysize);
-    doParsimArrayPacking(b,this->arrayField1,arrayField1_arraysize);
-    doParsimArrayPacking(b,this->arrayField2,10);
+    doParsimPacking(b,this->game_state);
+    doParsimPacking(b,this->srcAddr);
+    doParsimPacking(b,this->hopcount);
+    doParsimPacking(b,this->startTime);
+    doParsimPacking(b,this->lastHopAddr);
 }
 
 void MyPacket::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cPacket::parsimUnpack(b);
-    doParsimUnpacking(b,this->someField);
-    doParsimUnpacking(b,this->anotherField);
-    delete [] this->arrayField1;
-    b->unpack(arrayField1_arraysize);
-    if (arrayField1_arraysize==0) {
-        this->arrayField1 = 0;
-    } else {
-        this->arrayField1 = new double[arrayField1_arraysize];
-        doParsimArrayUnpacking(b,this->arrayField1,arrayField1_arraysize);
-    }
-    doParsimArrayUnpacking(b,this->arrayField2,10);
+    doParsimUnpacking(b,this->game_state);
+    doParsimUnpacking(b,this->srcAddr);
+    doParsimUnpacking(b,this->hopcount);
+    doParsimUnpacking(b,this->startTime);
+    doParsimUnpacking(b,this->lastHopAddr);
 }
 
-int MyPacket::getSomeField() const
+int MyPacket::getGame_state() const
 {
-    return this->someField;
+    return this->game_state;
 }
 
-void MyPacket::setSomeField(int someField)
+void MyPacket::setGame_state(int game_state)
 {
-    this->someField = someField;
+    this->game_state = game_state;
 }
 
-const char * MyPacket::getAnotherField() const
+int MyPacket::getSrcAddr() const
 {
-    return this->anotherField.c_str();
+    return this->srcAddr;
 }
 
-void MyPacket::setAnotherField(const char * anotherField)
+void MyPacket::setSrcAddr(int srcAddr)
 {
-    this->anotherField = anotherField;
+    this->srcAddr = srcAddr;
 }
 
-void MyPacket::setArrayField1ArraySize(unsigned int size)
+int MyPacket::getHopcount() const
 {
-    double *arrayField12 = (size==0) ? nullptr : new double[size];
-    unsigned int sz = arrayField1_arraysize < size ? arrayField1_arraysize : size;
-    for (unsigned int i=0; i<sz; i++)
-        arrayField12[i] = this->arrayField1[i];
-    for (unsigned int i=sz; i<size; i++)
-        arrayField12[i] = 0;
-    arrayField1_arraysize = size;
-    delete [] this->arrayField1;
-    this->arrayField1 = arrayField12;
+    return this->hopcount;
 }
 
-unsigned int MyPacket::getArrayField1ArraySize() const
+void MyPacket::setHopcount(int hopcount)
 {
-    return arrayField1_arraysize;
+    this->hopcount = hopcount;
 }
 
-double MyPacket::getArrayField1(unsigned int k) const
+::omnetpp::simtime_t MyPacket::getStartTime() const
 {
-    if (k>=arrayField1_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", arrayField1_arraysize, k);
-    return this->arrayField1[k];
+    return this->startTime;
 }
 
-void MyPacket::setArrayField1(unsigned int k, double arrayField1)
+void MyPacket::setStartTime(::omnetpp::simtime_t startTime)
 {
-    if (k>=arrayField1_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", arrayField1_arraysize, k);
-    this->arrayField1[k] = arrayField1;
+    this->startTime = startTime;
 }
 
-unsigned int MyPacket::getArrayField2ArraySize() const
+int MyPacket::getLastHopAddr() const
 {
-    return 10;
+    return this->lastHopAddr;
 }
 
-double MyPacket::getArrayField2(unsigned int k) const
+void MyPacket::setLastHopAddr(int lastHopAddr)
 {
-    if (k>=10) throw omnetpp::cRuntimeError("Array of size 10 indexed by %lu", (unsigned long)k);
-    return this->arrayField2[k];
-}
-
-void MyPacket::setArrayField2(unsigned int k, double arrayField2)
-{
-    if (k>=10) throw omnetpp::cRuntimeError("Array of size 10 indexed by %lu", (unsigned long)k);
-    this->arrayField2[k] = arrayField2;
+    this->lastHopAddr = lastHopAddr;
 }
 
 class MyPacketDescriptor : public omnetpp::cClassDescriptor
@@ -379,7 +349,7 @@ const char *MyPacketDescriptor::getProperty(const char *propertyname) const
 int MyPacketDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 4+basedesc->getFieldCount() : 4;
+    return basedesc ? 5+basedesc->getFieldCount() : 5;
 }
 
 unsigned int MyPacketDescriptor::getFieldTypeFlags(int field) const
@@ -393,10 +363,11 @@ unsigned int MyPacketDescriptor::getFieldTypeFlags(int field) const
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
         FD_ISEDITABLE,
-        FD_ISARRAY | FD_ISEDITABLE,
-        FD_ISARRAY | FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
 }
 
 const char *MyPacketDescriptor::getFieldName(int field) const
@@ -408,22 +379,24 @@ const char *MyPacketDescriptor::getFieldName(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "someField",
-        "anotherField",
-        "arrayField1",
-        "arrayField2",
+        "game_state",
+        "srcAddr",
+        "hopcount",
+        "startTime",
+        "lastHopAddr",
     };
-    return (field>=0 && field<4) ? fieldNames[field] : nullptr;
+    return (field>=0 && field<5) ? fieldNames[field] : nullptr;
 }
 
 int MyPacketDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='s' && strcmp(fieldName, "someField")==0) return base+0;
-    if (fieldName[0]=='a' && strcmp(fieldName, "anotherField")==0) return base+1;
-    if (fieldName[0]=='a' && strcmp(fieldName, "arrayField1")==0) return base+2;
-    if (fieldName[0]=='a' && strcmp(fieldName, "arrayField2")==0) return base+3;
+    if (fieldName[0]=='g' && strcmp(fieldName, "game_state")==0) return base+0;
+    if (fieldName[0]=='s' && strcmp(fieldName, "srcAddr")==0) return base+1;
+    if (fieldName[0]=='h' && strcmp(fieldName, "hopcount")==0) return base+2;
+    if (fieldName[0]=='s' && strcmp(fieldName, "startTime")==0) return base+3;
+    if (fieldName[0]=='l' && strcmp(fieldName, "lastHopAddr")==0) return base+4;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -437,11 +410,12 @@ const char *MyPacketDescriptor::getFieldTypeString(int field) const
     }
     static const char *fieldTypeStrings[] = {
         "int",
-        "string",
-        "double",
-        "double",
+        "int",
+        "int",
+        "simtime_t",
+        "int",
     };
-    return (field>=0 && field<4) ? fieldTypeStrings[field] : nullptr;
+    return (field>=0 && field<5) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **MyPacketDescriptor::getFieldPropertyNames(int field) const
@@ -480,8 +454,6 @@ int MyPacketDescriptor::getFieldArraySize(void *object, int field) const
     }
     MyPacket *pp = (MyPacket *)object; (void)pp;
     switch (field) {
-        case 2: return pp->getArrayField1ArraySize();
-        case 3: return 10;
         default: return 0;
     }
 }
@@ -510,10 +482,11 @@ std::string MyPacketDescriptor::getFieldValueAsString(void *object, int field, i
     }
     MyPacket *pp = (MyPacket *)object; (void)pp;
     switch (field) {
-        case 0: return long2string(pp->getSomeField());
-        case 1: return oppstring2string(pp->getAnotherField());
-        case 2: return double2string(pp->getArrayField1(i));
-        case 3: return double2string(pp->getArrayField2(i));
+        case 0: return long2string(pp->getGame_state());
+        case 1: return long2string(pp->getSrcAddr());
+        case 2: return long2string(pp->getHopcount());
+        case 3: return simtime2string(pp->getStartTime());
+        case 4: return long2string(pp->getLastHopAddr());
         default: return "";
     }
 }
@@ -528,10 +501,11 @@ bool MyPacketDescriptor::setFieldValueAsString(void *object, int field, int i, c
     }
     MyPacket *pp = (MyPacket *)object; (void)pp;
     switch (field) {
-        case 0: pp->setSomeField(string2long(value)); return true;
-        case 1: pp->setAnotherField((value)); return true;
-        case 2: pp->setArrayField1(i,string2double(value)); return true;
-        case 3: pp->setArrayField2(i,string2double(value)); return true;
+        case 0: pp->setGame_state(string2long(value)); return true;
+        case 1: pp->setSrcAddr(string2long(value)); return true;
+        case 2: pp->setHopcount(string2long(value)); return true;
+        case 3: pp->setStartTime(string2simtime(value)); return true;
+        case 4: pp->setLastHopAddr(string2long(value)); return true;
         default: return false;
     }
 }

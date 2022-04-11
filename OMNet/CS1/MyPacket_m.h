@@ -23,21 +23,23 @@
  * <pre>
  * packet MyPacket
  * {
- *     int someField;
- *     string anotherField;
- *     double arrayField1[];
- *     double arrayField2[10];
+ *     int game_state;
+ *     int srcAddr = -1;
+ *     int hopcount = 0;
+ *     simtime_t startTime = 0;
+ *     int lastHopAddr = -1;
+ * 
  * }
  * </pre>
  */
 class MyPacket : public ::omnetpp::cPacket
 {
   protected:
-    int someField;
-    ::omnetpp::opp_string anotherField;
-    double *arrayField1; // array ptr
-    unsigned int arrayField1_arraysize;
-    double arrayField2[10];
+    int game_state;
+    int srcAddr;
+    int hopcount;
+    ::omnetpp::simtime_t startTime;
+    int lastHopAddr;
 
   private:
     void copy(const MyPacket& other);
@@ -56,17 +58,16 @@ class MyPacket : public ::omnetpp::cPacket
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual int getSomeField() const;
-    virtual void setSomeField(int someField);
-    virtual const char * getAnotherField() const;
-    virtual void setAnotherField(const char * anotherField);
-    virtual void setArrayField1ArraySize(unsigned int size);
-    virtual unsigned int getArrayField1ArraySize() const;
-    virtual double getArrayField1(unsigned int k) const;
-    virtual void setArrayField1(unsigned int k, double arrayField1);
-    virtual unsigned int getArrayField2ArraySize() const;
-    virtual double getArrayField2(unsigned int k) const;
-    virtual void setArrayField2(unsigned int k, double arrayField2);
+    virtual int getGame_state() const;
+    virtual void setGame_state(int game_state);
+    virtual int getSrcAddr() const;
+    virtual void setSrcAddr(int srcAddr);
+    virtual int getHopcount() const;
+    virtual void setHopcount(int hopcount);
+    virtual ::omnetpp::simtime_t getStartTime() const;
+    virtual void setStartTime(::omnetpp::simtime_t startTime);
+    virtual int getLastHopAddr() const;
+    virtual void setLastHopAddr(int lastHopAddr);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const MyPacket& obj) {obj.parsimPack(b);}

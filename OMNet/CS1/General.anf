@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scave:Analysis xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:scave="http://www.omnetpp.org/omnetpp/scave">
+  <inputs>
+    <inputs name="/CS1/results/General-*.vec"/>
+    <inputs name="/CS1/results/General-*.sca"/>
+  </inputs>
+  <datasets>
+    <datasets name="rtt">
+      <items xsi:type="scave:Add" filterPattern="file(/CS1/results/General-#0.vec) AND attr:configname(General) AND attr:runnumber(0) AND module(UP1.node6)" type="VECTOR"/>
+      <items xsi:type="scave:LineChart" name="" lineNameFormat="">
+        <properties name="Legend.Display" value="true"/>
+      </items>
+      <items xsi:type="scave:Add" filterPattern="file(/CS1/results/General-#0.vec) AND attr:configname(General) AND attr:runnumber(0) AND module(UP1.node5)" type="VECTOR"/>
+      <items xsi:type="scave:Add" filterPattern="file(/CS1/results/General-#0.vec) AND attr:configname(General) AND attr:runnumber(0) AND module(UP1.node4)" type="VECTOR"/>
+      <items xsi:type="scave:Add" filterPattern="file(/CS1/results/General-#0.vec) AND attr:configname(General) AND attr:runnumber(0) AND module(UP1.node3)" type="VECTOR"/>
+      <items xsi:type="scave:Add" filterPattern="file(/CS1/results/General-#0.vec) AND attr:configname(General) AND attr:runnumber(0) AND module(UP1.node1)" type="VECTOR"/>
+      <items xsi:type="scave:Add" filterPattern="file(/CS1/results/General-#0.vec) AND attr:configname(General) AND attr:runnumber(0) AND module(UP1.node2)" type="VECTOR"/>
+      <items xsi:type="scave:Add" filterPattern="file(/CS1/results/General-#0.vec) AND attr:configname(General) AND attr:runnumber(0) AND module(UP1.node7)" type="VECTOR"/>
+    </datasets>
+  </datasets>
+  <chartSheets>
+    <chartSheets name="default" charts="//@datasets/@datasets.0/@items.1"/>
+  </chartSheets>
+</scave:Analysis>

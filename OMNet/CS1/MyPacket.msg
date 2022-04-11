@@ -1,7 +1,9 @@
 
 packet MyPacket {
-    int someField;
-    string anotherField;
-    double arrayField1[];
-    double arrayField2[10];
+   	int game_state;
+	int srcAddr = -1;
+	int hopcount = 0;
+	simtime_t startTime = 0;
+	int lastHopAddr = -1;
+	
 }
