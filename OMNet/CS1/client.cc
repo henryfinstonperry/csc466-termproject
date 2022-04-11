@@ -200,6 +200,7 @@ private:
     simtime_t user_changed_world_timer;
     MyPacket *user_changed_world;
     double packet_drop_rate;
+    int state_counter;
 protected:
     virtual void flip_game_state();
     virtual void handleMessage(cMessage *msg) override;
@@ -225,11 +226,12 @@ node::~node()
 
 void node::initialize()
 {
+    state_counter = 0;
     if(par("packet_drop").doubleValue() == true)
     {
         packet_drop_rate = double(par("packet_drop"));
     }
-    user_changed_world_timer = uniform(0.1,3);
+    user_changed_world_timer = uniform(2,5);
     user_changed_world = new MyPacket("self");
     game_state = false;
     scheduleAt(simTime()+user_changed_world_timer, user_changed_world);
@@ -255,12 +257,14 @@ void node::handleMessage(cMessage *msg)
     if(msg == user_changed_world)
     {
         flip_game_state();
+        state_counter++;
         MyPacket *newMsg = nullptr;
         if(game_state){
             newMsg = new MyPacket("true");
         }else{
             newMsg = new MyPacket("false");
         }
+        newMsg->setSomeField(state_counter);
         if (uniform(0, 1) < packet_drop_rate)
         {
             newMsg->setBitError(true);
@@ -274,20 +278,28 @@ void node::handleMessage(cMessage *msg)
     }
     else
     {
-        const char *msg_game_state = msg->getName();
-        if(msg_game_state == std::string("true"))
-        {
-            game_state = true;
-            bubble("game state: true");
-        }
-        else if (msg_game_state == std::string("false"))
-        {
-            game_state = false;
-            bubble("game state: false");
-        }
-        else
-        {
-            bubble("received packet with bad name");
+        int other_state = packet_holder->getSomeField();
+        if(other_state > state_counter){
+            sendMessages(packet_holder);
+            state_counter = other_state;
+
+            const char *msg_game_state = msg->getName();
+            if(msg_game_state == std::string("true"))
+            {
+                game_state = true;
+                bubble("game state: true.");
+                EV << getName() << " state: " << state_counter <<"\n";
+            }
+            else if (msg_game_state == std::string("false"))
+            {
+                game_state = false;
+                bubble("game state: false.");
+                EV << getName() << " state: " << state_counter <<"\n";
+            }
+            else
+            {
+                bubble("received packet with bad name");
+            }
         }
     }
 }
