@@ -12,7 +12,7 @@
 
 ## Final report
 
-[Download PR](https://docs.google.com/document/d/1BkBQ9iPQX-IvFM_CMrCzE7syoj8JaQqSwHWDZdv323Y/edit?usp=sharing)
+<button>[Download PR](https://docs.google.com/document/d/1BkBQ9iPQX-IvFM_CMrCzE7syoj8JaQqSwHWDZdv323Y/edit?usp=sharing)</button>
 
 ## Project update
 
@@ -22,3 +22,6 @@
 
 [Download PP](https://docs.google.com/document/d/1vnjrAysrQ8N0YV7PXzzVy-eGMYY4nujcFOPSVO40po4/edit?usp=sharing)
 
+## Logbook
+
+[Download](https://docs.google.com/document/d/1QV-cfU2iyIDqPsB8eXJP7qlYGDombRUfVxUNeaqIr00/edit?usp=sharing)
