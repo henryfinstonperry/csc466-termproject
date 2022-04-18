@@ -2,11 +2,11 @@
 
 ## Part one
 
-<iframe src="https://drive.google.com/file/d/1Z9jSYLCProFktcHFu4VutYaThKKaNNzl/preview?usp=sharing" width="640" height="480" allow="autoplay"></iframe>
+<iframe src="https://drive.google.com/file/d/1Z9jSYLCProFktcHFu4VutYaThKKaNNzl/preview?usp=sharing" width="640" height="480" allow="autoplay fullscreen"></iframe>
 
 ## Part two
 
-<iframe src="https://drive.google.com/file/d/1-BBLOwNFsy9dA8b1OBAFWWLb8Ejt3hpl/preview?usp=sharing" width="640" height="480" allow="autoplay"></iframe>
+<iframe src="https://drive.google.com/file/d/1-BBLOwNFsy9dA8b1OBAFWWLb8Ejt3hpl/preview?usp=sharing" width="640" height="480" allow="autoplay fullscreen"></iframe>
 
 # Publications
 
