@@ -12,7 +12,7 @@
 
 ## Final report
 
-<button>[Download PR](https://docs.google.com/document/d/1BkBQ9iPQX-IvFM_CMrCzE7syoj8JaQqSwHWDZdv323Y/edit?usp=sharing)</button>
+[Download PR](https://docs.google.com/document/d/1BkBQ9iPQX-IvFM_CMrCzE7syoj8JaQqSwHWDZdv323Y/edit?usp=sharing)
 
 ## Project update
 
